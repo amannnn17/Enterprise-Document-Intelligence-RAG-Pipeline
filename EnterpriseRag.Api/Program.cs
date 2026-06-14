@@ -10,6 +10,27 @@ builder.Services.AddControllers();
 builder.Services.AddTransient<EnterpriseRag.Api.Services.IDocumentParserService, EnterpriseRag.Api.Services.PdfParserService>();
 builder.Services.AddTransient<EnterpriseRag.Api.Services.IChunkingService, EnterpriseRag.Api.Services.TokenSizeChunkingService>();
 
+// Register configuration
+builder.Services.Configure<EnterpriseRag.Api.Config.EmbeddingConfig>(
+    builder.Configuration.GetSection(EnterpriseRag.Api.Config.EmbeddingConfig.SectionName));
+
+// Register HttpClient and embedding service
+builder.Services.AddHttpClient<EnterpriseRag.Api.Services.IEmbeddingService, EnterpriseRag.Api.Services.OpenAiEmbeddingService>();
+
+// Register MongoDB configuration
+builder.Services.Configure<EnterpriseRag.Api.Config.MongoDbConfig>(
+    builder.Configuration.GetSection(EnterpriseRag.Api.Config.MongoDbConfig.SectionName));
+
+// Register MongoClient as a Singleton to prevent socket exhaustion
+builder.Services.AddSingleton<MongoDB.Driver.IMongoClient>(sp =>
+{
+    var config = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<EnterpriseRag.Api.Config.MongoDbConfig>>().Value;
+    return new MongoDB.Driver.MongoClient(config.ConnectionString);
+});
+
+// Register MongoDbContext as a Singleton
+builder.Services.AddSingleton<EnterpriseRag.Api.Data.MongoDbContext>();
+
 // Configure CORS for a production-ready API
 builder.Services.AddCors(options =>
 {
