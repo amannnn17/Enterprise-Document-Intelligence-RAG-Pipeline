@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using MongoDB.Driver;
 
 namespace EnterpriseRag.Api.Controllers
 {
@@ -153,6 +154,9 @@ namespace EnterpriseRag.Api.Controllers
                 }
 
                 // 4. Perform a bulk write operation (InsertManyAsync) to save all records to MongoDB
+                _logger.LogInformation("Removing existing chunks for {FileName} to prevent duplicates.", file.FileName);
+                await _dbContext.DocumentChunks.DeleteManyAsync(c => c.SourceFile == file.FileName);
+
                 _logger.LogInformation("Bulk inserting {Count} chunks into MongoDB for file {FileName}", documentChunks.Count, file.FileName);
                 await _dbContext.DocumentChunks.InsertManyAsync(documentChunks);
 

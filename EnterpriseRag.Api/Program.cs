@@ -10,12 +10,19 @@ builder.Services.AddControllers();
 builder.Services.AddTransient<EnterpriseRag.Api.Services.IDocumentParserService, EnterpriseRag.Api.Services.PdfParserService>();
 builder.Services.AddTransient<EnterpriseRag.Api.Services.IChunkingService, EnterpriseRag.Api.Services.TokenSizeChunkingService>();
 
-// Register configuration
-builder.Services.Configure<EnterpriseRag.Api.Config.EmbeddingConfig>(
-    builder.Configuration.GetSection(EnterpriseRag.Api.Config.EmbeddingConfig.SectionName));
+// Register Groq configuration
+builder.Services.Configure<EnterpriseRag.Api.Config.GroqConfig>(
+    builder.Configuration.GetSection(EnterpriseRag.Api.Config.GroqConfig.SectionName));
 
-// Register HttpClient and embedding service
-builder.Services.AddHttpClient<EnterpriseRag.Api.Services.IEmbeddingService, EnterpriseRag.Api.Services.OpenAiEmbeddingService>();
+// Register HuggingFace configuration
+builder.Services.Configure<EnterpriseRag.Api.Config.HuggingFaceConfig>(
+    builder.Configuration.GetSection(EnterpriseRag.Api.Config.HuggingFaceConfig.SectionName));
+
+// Register ILlmService using Groq
+builder.Services.AddSingleton<EnterpriseRag.Api.Services.ILlmService, EnterpriseRag.Api.Services.GroqGenerationService>();
+
+// Register IEmbeddingService using HuggingFace
+builder.Services.AddHttpClient<EnterpriseRag.Api.Services.IEmbeddingService, EnterpriseRag.Api.Services.HuggingFaceEmbeddingService>();
 
 // Register MongoDB configuration
 builder.Services.Configure<EnterpriseRag.Api.Config.MongoDbConfig>(
