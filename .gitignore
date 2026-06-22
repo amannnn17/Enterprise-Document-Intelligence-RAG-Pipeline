@@ -7,6 +7,8 @@
 .env
 
 # User-specific files
+Interview_Guide_Enterprise_RAG.md
+Interview_Guide_Enterprise_RAG.pdf
 *.rsuser
 *.suo
 *.user
