@@ -2,10 +2,10 @@
 
 A robust, full-stack **Retrieval-Augmented Generation (RAG)** system built to ingest, vectorize, and intelligently query enterprise documents (PDFs). 
 
-This application bridges the gap between raw, private enterprise data and Large Language Models (LLMs), featuring a highly optimized C# .NET backend, a lightning-fast Groq Llama 3.1 inference engine, and a stunning React-based glassmorphism UI.
+This application bridges the gap between raw, private enterprise data and Large Language Models (LLMs), featuring a highly optimized Node.js / Express backend, a lightning-fast Groq Llama 3.1 inference engine, and a stunning React-based glassmorphism UI.
 
 ![Enterprise RAG UI](https://img.shields.io/badge/UI-React_|_Tailwind_CSS-blue)
-![Backend](https://img.shields.io/badge/Backend-.NET_8_|_C%23-512BD4)
+![Backend](https://img.shields.io/badge/Backend-Node.js_|_Express-339933)
 ![Database](https://img.shields.io/badge/Vector_DB-MongoDB_Atlas-47A248)
 ![AI Models](https://img.shields.io/badge/AI-HuggingFace_|_Groq_Llama_3.1-F58025)
 
@@ -14,7 +14,7 @@ This application bridges the gap between raw, private enterprise data and Large 
 ## ✨ Key Features
 
 ### 📄 Intelligent Document Ingestion
-- **PDF Extraction**: Extracts raw text from uploaded PDF documents using `UglyToad.PdfPig`.
+- **PDF Extraction**: Extracts raw text from uploaded PDF documents using `pdf-parse`.
 - **Automated Chunking**: Splits large documents into token-optimized text chunks.
 - **Idempotent Pipeline**: Automatically scrubs existing chunks for a document before re-ingestion to prevent database duplication.
 
@@ -37,7 +37,7 @@ This application bridges the gap between raw, private enterprise data and Large 
 
 | Component | Technology |
 | :--- | :--- |
-| **Backend Framework** | .NET Core 8 Web API |
+| **Backend Framework** | Node.js, Express, TypeScript |
 | **Frontend Framework** | React (Vite, TypeScript, Tailwind CSS, Lucide Icons) |
 | **Vector Database** | MongoDB Atlas Vector Search |
 | **Embedding Model** | HuggingFace Inference API (`all-MiniLM-L6-v2`) |
@@ -48,27 +48,26 @@ This application bridges the gap between raw, private enterprise data and Large 
 ## 🚀 Getting Started
 
 ### 1. Prerequisites
-- [.NET 8 SDK](https://dotnet.microsoft.com/download)
 - [Node.js](https://nodejs.org/en/)
 - MongoDB Atlas Cluster (with a properly configured Vector Search Index)
 - Groq API Key & HuggingFace API Token
 
 ### 2. Configure Environment Secrets
-Ensure you have configured your local secrets or `appsettings.json` in the `EnterpriseRag.Api` project with your credentials:
-```json
-"MongoDb": {
-  "ConnectionString": "YOUR_MONGODB_CONNECTION_STRING",
-  "DatabaseName": "EnterpriseRagDb",
-  "CollectionName": "DocumentChunks"
-},
-"Groq": { "ApiKey": "YOUR_GROQ_API_KEY" },
-"HuggingFace": { "ApiToken": "YOUR_HUGGINGFACE_API_TOKEN" }
+Create a `.env` file in the `enterprise-rag-node-api` directory with your credentials:
+```env
+MONGODB_CONNECTION_STRING="YOUR_MONGODB_CONNECTION_STRING"
+MONGODB_DATABASE_NAME="EnterpriseRagDb"
+MONGODB_COLLECTION_NAME="DocumentChunks"
+GROQ_API_KEY="YOUR_GROQ_API_KEY"
+HUGGINGFACE_API_TOKEN="YOUR_HUGGINGFACE_API_TOKEN"
+PORT=5209
 ```
 
 ### 3. Start the Backend API
 ```bash
-cd EnterpriseRag.Api
-dotnet run
+cd enterprise-rag-node-api
+npm install
+npm start
 ```
 The API will start on `http://localhost:5209`.
 
@@ -85,7 +84,7 @@ Navigate to `http://localhost:5173` in your browser to experience the applicatio
 
 ## 🏗️ Architecture Diagram (Data Flow)
 
-1. **Upload**: User uploads PDF via React UI `->` `.NET API (/upload)`.
+1. **Upload**: User uploads PDF via React UI `->` `Node.js API (/upload)`.
 2. **Process**: Text Extracted `->` Chunked `->` Sent to HuggingFace `->` 384D Vectors Generated.
 3. **Store**: Vectors & Metadata bulk-inserted into `MongoDB Atlas`.
 4. **Query**: User asks question `->` Question Vectorized via HuggingFace `->` `$vectorSearch` hits MongoDB.
